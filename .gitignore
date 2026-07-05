@@ -1,1 +1,3 @@
 node_modules/
+.ghx
+.DS_Store

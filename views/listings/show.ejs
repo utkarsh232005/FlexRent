@@ -1,0 +1,49 @@
+<% layout("/layouts/boilerplate") %>
+    <div class="show-page py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+                <div class="show-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                    <div>
+                        <p class="show-kicker mb-1">Listing Details</p>
+                        <h1 class="show-title mb-0">
+                            <%= listing.title %>
+                        </h1>
+                    </div>
+                    <div class="show-price-pill">
+                        ₹<%= listing.price.toLocaleString("en-IN") %> / night
+                    </div>
+                </div>
+
+                <div class="card show-card shadow-sm overflow-hidden">
+                    <img src="<%= listing.image.url %>" class="card-img-top show-image" alt="listing-image">
+                    <div class="card-body show-card-body p-4 p-md-5">
+                        <div class="show-meta d-flex flex-wrap gap-2 mb-4">
+                            <span class="show-chip"><i class="fa-solid fa-location-dot me-2"></i>
+                                <%= listing.location %>
+                            </span>
+                            <span class="show-chip"><i class="fa-solid fa-globe me-2"></i>
+                                <%= listing.country %>
+                            </span>
+                            <span class="show-chip show-chip-accent"><i class="fa-solid fa-indian-rupee-sign me-2"></i>
+                                <%= listing.price.toLocaleString("en-IN") %>
+                            </span>
+                        </div>
+
+                        <div class="show-section">
+                            <h2 class="show-section-title">About this place</h2>
+                            <p class="show-description mb-0">
+                                <%= listing.description %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="show-actions d-flex flex-wrap gap-3 justify-content-end mt-4">
+                    <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-secondary px-4">Edit Listing</a>
+                    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="m-0">
+                        <button type="submit" class="btn btn-danger px-4">Delete Listing</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>

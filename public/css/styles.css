@@ -1,5 +1,5 @@
 body{
-    background-color:pink ;
+    background-color: #fafafa;
     font-family: "Plus Jakarta Sans", sans-serif !important;
     font-optical-sizing: auto;
     font-weight: <weight>;
@@ -73,8 +73,8 @@ body{
 }
 
 /* Cards */
-.card{
-    border:none !important;
+.listing-card {
+    border: none !important;
     margin-bottom: 2rem;
 }
 
@@ -131,12 +131,12 @@ body{
 }
 
 .show-price-pill {
-    background: linear-gradient(135deg, #ff385c, #ff7a59);
+    background-color: #ff385c;
     color: #ffffff;
     padding: 0.85rem 1.25rem;
     border-radius: 999px;
     font-weight: 700;
-    box-shadow: 0 12px 30px rgba(255, 56, 92, 0.22);
+    box-shadow: 0 4px 12px rgba(255, 56, 92, 0.15);
 }
 
 .show-card {
@@ -151,7 +151,7 @@ body{
 }
 
 .show-card-body {
-    background: linear-gradient(180deg, #ffffff 0%, #fff8f6 100%);
+    background-color: #ffffff;
 }
 
 .show-meta {
@@ -220,4 +220,26 @@ body{
     .show-actions .btn {
         width: 100%;
     }
+}
+
+/* Star Rating Input */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+.star-rating input {
+    display: none;
+}
+.star-rating label {
+    font-size: 1.6rem;
+    color: #e0e0e0;
+    cursor: pointer;
+    margin-right: 0.25rem;
+    transition: color 0.15s ease-in-out;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #ffb400;
 }

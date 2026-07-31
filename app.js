@@ -7,6 +7,8 @@ const app = express();
 const Listing = require("./model/listing");
 const MONGO_URL = process.env.MONGO_URL;
 const LOCAL_MONGO_URL = process.env.LOCAL_MONGO_URL || "mongodb://127.0.0.1:27017/airbnb";
+const dbUrl = MONGO_URL || LOCAL_MONGO_URL;
+
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
@@ -15,6 +17,7 @@ const Review = require("./model/review");
 const listings = require("./routes/listing.js");
 const reviews = require("./routes/review.js");
 const session = require("express-session");
+const { MongoStore } = require("connect-mongo");
 const connectFlash = require("connect-flash");
 const User = require("./model/user.js");
 const passport = require("passport");
@@ -25,36 +28,41 @@ const IS_VERCEL = !!process.env.VERCEL || process.env.NODE_ENV === "production";
 
 let AtlasListing, AtlasReview;
 
-if (IS_VERCEL) {
-    main()
-        .then(() => console.log("connected to Atlas db (Production)"))
-        .catch((err) => console.log(err));
-
-    async function main() {
-        await mongoose.connect(MONGO_URL);
+async function connectDB() {
+    if (mongoose.connection.readyState >= 1) {
+        return;
     }
+    await mongoose.connect(dbUrl);
+}
 
-    AtlasListing = Listing;
-    AtlasReview = Review;
-} else {
-    main()
-        .then(() => console.log("connected to local db"))
-        .catch((err) => console.log(err));
+connectDB()
+    .then(() => console.log("connected to DB"))
+    .catch((err) => console.error("DB connection error:", err));
 
-    async function main() {
-        await mongoose.connect(LOCAL_MONGO_URL);
-    }
-
+if (!IS_VERCEL && MONGO_URL) {
     const atlasConnection = mongoose.createConnection(MONGO_URL);
     atlasConnection.on("connected", () => console.log("connected to atlas db (Development Sync)"));
     atlasConnection.on("error", (err) => console.error("atlas db error:", err));
 
     AtlasListing = atlasConnection.model("Listing", Listing.schema);
     AtlasReview = atlasConnection.model("Review", Review.schema);
+} else {
+    AtlasListing = Listing;
+    AtlasReview = Review;
 }
 
 app.set("AtlasListing", AtlasListing);
 app.set("AtlasReview", AtlasReview);
+
+// Ensure DB connection is ready before processing requests (fixes buffering timeout in serverless)
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -69,8 +77,23 @@ if (!process.env.VERCEL) {
     });
 }
 
+const secret = process.env.SECRET || "mysupersecretcode";
+
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    crypto: {
+        secret: secret,
+    },
+    touchAfter: 24 * 3600,
+});
+
+store.on("error", (err) => {
+    console.log("ERROR in MONGO SESSION STORE", err);
+});
+
 const sessionOptions = {
-    secret: "mysupersecretcode",
+    store,
+    secret: secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -78,7 +101,7 @@ const sessionOptions = {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true
     }
-}
+};
 
 app.use(session(sessionOptions));
 app.use(connectFlash());

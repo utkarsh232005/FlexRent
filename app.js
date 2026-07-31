@@ -14,6 +14,12 @@ const ExpressError = require("./utils/ExpressError");
 const Review = require("./model/review");
 const listings = require("./routes/listing.js");
 const reviews = require("./routes/review.js");
+const session = require("express-session");
+const connectFlash = require("connect-flash");
+const User = require("./model/user.js");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const userRouter = require("./routes/user.js");
 
 const IS_VERCEL = !!process.env.VERCEL || process.env.NODE_ENV === "production";
 
@@ -63,6 +69,34 @@ if (!process.env.VERCEL) {
     });
 }
 
+const sessionOptions = {
+    secret: "mysupersecretcode",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true
+    }
+}
+
+app.use(session(sessionOptions));
+app.use(connectFlash());
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+//local variable middleware to store flash messages and user info
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    res.locals.currUser = req.user;
+    next();
+});
+
 //root route
 app.get("/", (req, res) => {
     res.render("./home");
@@ -70,6 +104,16 @@ app.get("/", (req, res) => {
 
 app.use("/listings", listings);
 app.use("/listings/:id/reviews", reviews);
+app.use("/", userRouter);
+
+app.get("/demouser", async (req, res) => {
+    let fakeUser = new User({
+        email: "student@gmail.com",
+        username: "delta-student"
+    });
+    let registeredUser = await User.register(fakeUser, "helloworld");
+    res.send(registeredUser);
+});
 
 //middleware
 app.all("/*any", (req, res, next) => {

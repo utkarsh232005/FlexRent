@@ -31,6 +31,10 @@ router.get("/new", (req, res) => {
 router.get("/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id).populate("reviews");
+    if (!listing) {
+        req.flash("error", "Listing not found");
+        return res.redirect("/listings");
+    }
     res.render("./listings/show", { listing });
 }));
 
@@ -47,7 +51,7 @@ router.post("/", validatelisting, wrapAsync(async (req, res) => {
 
     // Synchronize the newly created listing to MongoDB Atlas (Development Sync)
     await syncAtlas(req, "createListing", { id: listingId, data: req.body.listing });
-
+    req.flash("success", "Listing added");
     res.redirect(`/listings`);
     console.log("Listing saved");
 }));
@@ -77,6 +81,7 @@ router.put("/:id", validatelisting, wrapAsync(async (req, res) => {
     // Synchronize listing updates to MongoDB Atlas (Development Sync)
     await syncAtlas(req, "updateListing", { id, data: updateData });
 
+    req.flash("success", "Listing Updated!");
     res.redirect(`/listings/${listing._id}`);
 }));
 
@@ -88,6 +93,7 @@ router.delete("/:id", wrapAsync(async (req, res) => {
     // Synchronize listing deletion (along with its reviews) to MongoDB Atlas (Development Sync)
     await syncAtlas(req, "deleteListing", { id });
 
+    req.flash("success", "Listing Deleted!");
     console.log("Listing deleted");
     res.redirect("/listings");
 }));

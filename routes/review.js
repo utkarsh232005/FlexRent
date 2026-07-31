@@ -30,6 +30,7 @@ router.post("/", validatereview, wrapAsync(async (req, res) => {
     // Synchronize the newly created review to MongoDB Atlas (Development Sync)
     await syncAtlas(req, "createReview", { listingId: req.params.id, reviewId, data: req.body.review });
 
+    req.flash("success", "Review Created!");
     res.redirect(`/listings/${listing._id}`);
 }));
 
@@ -43,6 +44,7 @@ router.delete("/:reviewId", wrapAsync(async (req, res) => {
     // Synchronize review deletion to MongoDB Atlas (Development Sync)
     await syncAtlas(req, "deleteReview", { listingId: id, reviewId });
 
+    req.flash("success", "Review Deleted!");
     res.redirect(`/listings/${id}`);
 }));
 

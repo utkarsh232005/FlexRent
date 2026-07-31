@@ -6,6 +6,7 @@ const ExpressError = require("../utils/ExpressError");
 const { listingSchema, reviewSchema } = require("../schema.js");
 const Listing = require("../model/listing");
 const { syncAtlas } = require("../utils/dbSync");
+const { isLoggedIn } = require("../middleware");
 
 const validatelisting = (req, res, next) => {
     let { error } = listingSchema.validate(req.body);
@@ -23,7 +24,7 @@ router.get("/", wrapAsync(async (req, res) => {
 }));
 
 //create route for listings
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
     res.render("./listings/new");
 });
 
@@ -40,7 +41,7 @@ router.get("/:id", wrapAsync(async (req, res) => {
 
 
 //create route for listings post request
-router.post("/", validatelisting, wrapAsync(async (req, res) => {
+router.post("/", isLoggedIn, validatelisting, wrapAsync(async (req, res) => {
     let { image, ...rest } = req.body.listing;
     const listingId = new mongoose.Types.ObjectId();
     const newListing = new Listing({ _id: listingId, ...rest });
@@ -57,14 +58,14 @@ router.post("/", validatelisting, wrapAsync(async (req, res) => {
 }));
 
 //update route for listings
-router.get("/:id/edit", wrapAsync(async (req, res) => {
+router.get("/:id/edit", isLoggedIn, wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
     res.render("./listings/edit", { listing });
 }));
 
 //update route for listings put request
-router.put("/:id", validatelisting, wrapAsync(async (req, res) => {
+router.put("/:id", isLoggedIn, validatelisting, wrapAsync(async (req, res) => {
     let { id } = req.params;
     const { image, ...rest } = req.body.listing;
     const updateData = { ...rest };
@@ -86,7 +87,7 @@ router.put("/:id", validatelisting, wrapAsync(async (req, res) => {
 }));
 
 //delete route for listings
-router.delete("/:id", wrapAsync(async (req, res) => {
+router.delete("/:id", isLoggedIn, wrapAsync(async (req, res) => {
     let { id } = req.params;
     await Listing.findByIdAndDelete(id);
 

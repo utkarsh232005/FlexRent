@@ -19,11 +19,16 @@ router.post("/signup", wrapAsync(async (req, res, next) => {
                 return next(err);
             }
             req.flash("success", "Welcome to FlexRent!");
-            res.redirect("/listings");
+            req.session.save((err) => {
+                if (err) return next(err);
+                res.redirect("/listings");
+            });
         });
     } catch (e) {
         req.flash("error", e.message);
-        res.redirect("/signup");
+        req.session.save(() => {
+            res.redirect("/signup");
+        });
     }
 }));
 
@@ -31,9 +36,25 @@ router.get("/login", (req, res) => {
     res.render("users/login.ejs");
 });
 
-router.post("/login", passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), async (req, res) => {
+router.post("/login", passport.authenticate("local", { failureRedirect: "/login", failureFlash: true }), async (req, res, next) => {
     req.flash("success", "Welcome back to FlexRent!");
-    res.redirect("/listings");
+    req.session.save((err) => {
+        if (err) return next(err);
+        res.redirect("/listings");
+    });
+});
+
+router.get("/logout", (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        req.flash("success", "Logged out successfully!");
+        req.session.save((err) => {
+            if (err) return next(err);
+            res.redirect("/listings");
+        });
+    });
 });
 
 module.exports = router;

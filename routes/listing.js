@@ -31,11 +31,12 @@ router.get("/new", isLoggedIn, (req, res) => {
 //show route for listings
 router.get("/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
+    const listing = await Listing.findById(id).populate("reviews").populate("owner");
     if (!listing) {
         req.flash("error", "Listing not found");
         return res.redirect("/listings");
     }
+    console.log(listing);
     res.render("./listings/show", { listing });
 }));
 
@@ -48,6 +49,7 @@ router.post("/", isLoggedIn, validatelisting, wrapAsync(async (req, res) => {
     if (image && image !== "") {
         newListing.image = { filename: "listingimage", url: image };
     }
+    newListing.owner = req.user._id;
     await newListing.save();
 
     // Synchronize the newly created listing to MongoDB Atlas (Development Sync)

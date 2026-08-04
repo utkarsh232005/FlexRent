@@ -20,6 +20,9 @@
                 <!-- Left Column: Description -->
                 <div class="col-12 col-md-7 col-lg-8">
                     <div class="pb-4 mb-4" style="border-bottom: 1px solid #ebebeb;">
+                        <p class="mb-3" style="color: #717171;">
+                            Owned by <i><%= listing.owner ? listing.owner.username : "Owner" %></i>
+                        </p>
                         <h2 class="fw-semibold mb-2" style="font-size: 1.35rem;">About this place</h2>
                         <p style="color: #717171; line-height: 1.7; font-size: 1rem;">
                             <%= listing.description %>

@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+const Listing = require("../model/listing");
 const IS_VERCEL = !!process.env.VERCEL || process.env.NODE_ENV === "production";
 
 /**
@@ -14,15 +16,14 @@ async function syncAtlas(req, action, payload) {
     const AtlasListing = req.app.get("AtlasListing");
     const AtlasReview = req.app.get("AtlasReview");
 
-    if (!AtlasListing || !AtlasReview) {
-        console.error("Atlas database connections/models not initialized on the application instance.");
+    if (!AtlasListing || !AtlasReview || AtlasListing === Listing || AtlasListing.db === mongoose.connection) {
         return;
     }
 
     switch (action) {
         case "createListing": {
             const { id, data } = payload;
-            const { image, ...rest } = data;
+            const { image, _id, ...rest } = data;
             const newAtlasListing = new AtlasListing({ _id: id, ...rest });
             if (image && image !== "") {
                 newAtlasListing.image = { filename: "listingimage", url: image };
@@ -48,7 +49,8 @@ async function syncAtlas(req, action, payload) {
             const { listingId, reviewId, data } = payload;
             let atlasListing = await AtlasListing.findById(listingId);
             if (atlasListing) {
-                let newAtlasReview = new AtlasReview({ _id: reviewId, ...data });
+                let { _id, ...reviewData } = data;
+                let newAtlasReview = new AtlasReview({ _id: reviewId, ...reviewData });
                 atlasListing.reviews.push(newAtlasReview);
                 await newAtlasReview.save();
                 await atlasListing.save();

@@ -4,7 +4,7 @@
         <div class="col-8 offset-2">
 
             <h1>Create a New Listing</h1>
-            <form method="post" action="/listings" novalidate class="needs-validation">
+            <form method="post" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title:</label>
                     <input type="text" id="title" name="listing[title]" class="form-control"
@@ -19,18 +19,22 @@
                     <div class="valid-feedback">Description looks good!</div>
                     <div class="invalid-feedback">Please enter a short description.</div>
                 </div>
-                <div class="mb-3">
-                    <label for="image" class="form-label">Image:</label>
+                <!-- <div class="mb-3">
+                    <label for="image" class="form-label">Image Link:</label>
                     <textarea id="image" name="listing[image]" class="form-control"
                         placeholder="Paste an image URL"></textarea>
                     <div class="valid-feedback">Image link looks good!</div>
                     <div class="invalid-feedback">Please provide a valid image URL.</div>
+                </div> -->
+                <div class="mb-3">
+                    <label for="image" class="form-label">Image:</label>
+                    <input type="file" id="image" name="listing[image]" class="form-control">
                 </div>
                 <div class="row">
                     <div class="mb-3 col-md-4">
                         <label for="price" class="form-label">Price:</label>
-                        <input id="price" name="listing[price]" class="form-control" step="100"
-                            placeholder="e.g. 2500" required>
+                        <input id="price" name="listing[price]" class="form-control" step="100" placeholder="e.g. 2500"
+                            required>
                         <div class="valid-feedback">Price looks good!</div>
                         <div class="invalid-feedback">Please enter a valid price.</div>
                     </div>

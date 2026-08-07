@@ -1,52 +1,13 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
-const mongoose = require("mongoose");
 const wrapAsync = require("../utils/wrapAsync");
-const ExpressError = require("../utils/ExpressError");
-const { reviewSchema } = require("../schema.js");
-const Listing = require("../model/listing");
-const Review = require("../model/review");
-const { syncAtlas } = require("../utils/dbSync");
-const { isLoggedIn } = require("../middleware");
+const { isLoggedIn, validateReview, isReviewAuthor } = require("../middleware");
+const ReviewController = require("../controllers/review");
 
-const validatereview = (req, res, next) => {
-    let { error } = reviewSchema.validate(req.body);
-    if (error) {
-        throw new ExpressError(error.details[0].message, 400);
-    } else {
-        next();
-    }
-};
+router.route("/")
+    .post(isLoggedIn, validateReview, wrapAsync(ReviewController.create));
 
-// Reviews POST Route
-router.post("/", isLoggedIn, validatereview, wrapAsync(async (req, res) => {
-    let listing = await Listing.findById(req.params.id);
-    const reviewId = new mongoose.Types.ObjectId();
-    let newReview = new Review({ _id: reviewId, ...req.body.review });
-
-    listing.reviews.push(newReview);
-    await newReview.save();
-    await listing.save();
-
-    // Synchronize the newly created review to MongoDB Atlas (Development Sync)
-    await syncAtlas(req, "createReview", { listingId: req.params.id, reviewId, data: req.body.review });
-
-    req.flash("success", "Review Created!");
-    res.redirect(`/listings/${listing._id}`);
-}));
-
-// Reviews DELETE Route
-router.delete("/:reviewId", isLoggedIn, wrapAsync(async (req, res) => {
-    let { id, reviewId } = req.params;
-
-    await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-
-    // Synchronize review deletion to MongoDB Atlas (Development Sync)
-    await syncAtlas(req, "deleteReview", { listingId: id, reviewId });
-
-    req.flash("success", "Review Deleted!");
-    res.redirect(`/listings/${id}`);
-}));
+router.route("/:reviewId")
+    .delete(isLoggedIn, isReviewAuthor, wrapAsync(ReviewController.destroy));
 
 module.exports = router;

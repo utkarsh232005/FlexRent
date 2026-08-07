@@ -39,7 +39,7 @@ connectDB()
     .then(() => console.log("connected to DB"))
     .catch((err) => console.error("DB connection error:", err));
 
-if (!IS_VERCEL && MONGO_URL) {
+if (!IS_VERCEL && MONGO_URL && dbUrl !== MONGO_URL) {
     const atlasConnection = mongoose.createConnection(MONGO_URL);
     atlasConnection.on("connected", () => console.log("connected to atlas db (Development Sync)"));
     atlasConnection.on("error", (err) => console.error("atlas db error:", err));

@@ -1,4 +1,5 @@
 const Listing = require("../model/listing");
+const { cloudinary } = require("../cloudConfig");
 const { syncAtlas } = require("../utils/dbSync");
 
 // GET /listings
@@ -73,7 +74,12 @@ module.exports.update = async (req, res) => {
 // DELETE /listings/:id
 module.exports.destroy = async (req, res) => {
     let { id } = req.params;
-    await Listing.findByIdAndDelete(id);
+    const listing = await Listing.findByIdAndDelete(id);
+
+    // Delete image from Cloudinary if it exists
+    if (listing && listing.image && listing.image.filename) {
+        await cloudinary.uploader.destroy(listing.image.filename);
+    }
 
     // Synchronize listing deletion (along with its reviews) to MongoDB Atlas (Development Sync)
     await syncAtlas(req, "deleteListing", { id });

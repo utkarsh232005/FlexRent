@@ -1,24 +1,52 @@
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <div class="container-fluid px-3 px-md-4 position-relative">
+
+        <!-- Brand (Left) -->
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/listings">
+            <i class="fa-regular fa-compass"></i>
+            <span class="navbar-brand-text">FlexRent</span>
+        </a>
+
+        <!-- Search Bar (Dead-Centered on Desktop) -->
+        <form class="nav-search" action="/listings" method="GET" id="navSearchForm">
+            <input
+                type="text"
+                name="q"
+                id="navSearchInput"
+                class="nav-search__input"
+                placeholder="Search destinations, cities…"
+                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+                autocomplete="off"
+            >
+            <button type="submit" class="nav-search__btn" aria-label="Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <div id="navSearchSuggestions" class="nav-search__suggestions" style="display: none;"></div>
+        </form>
+
+        <!-- Mobile Toggler -->
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarMain" aria-controls="navbarMain"
+            aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
+
+        <!-- Collapsible Menu (Right) -->
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <div class="navbar-nav ms-auto align-items-center gap-2 mt-3 mt-md-0">
                 <a class="nav-link" href="/listings">Explore</a>
-            </div>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/listings/new">Add new Listing</a>
+                <a class="nav-link" href="/listings/new">Add Listing</a>
                 <% if(!currUser) { %>
                     <a class="nav-link" href="/signup"><b>Sign Up</b></a>
-                    <a class="nav-link" href="/login"><b>Log In</b></a>
-                <% } %>
-                <% if(currUser) { %>
-                    <a class="nav-link" href="/logout"><b>Log Out</b></a>
+                    <a class="nav-link nav-link--cta" href="/login">Log In</a>
+                <% } else { %>
+                    <span class="nav-user">
+                        <i class="fa-solid fa-circle-user me-1"></i><%= currUser.username %>
+                    </span>
+                    <a class="nav-link nav-link--cta" href="/logout">Log Out</a>
                 <% } %>
             </div>
         </div>
+
     </div>
 </nav>

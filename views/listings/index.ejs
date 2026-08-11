@@ -63,6 +63,28 @@
             </div>
         </div>
 
+        <% if (searchQuery) { %>
+        <div class="search-result-header">
+            <p>
+                <% if (allListings.length > 0) { %>
+                    <span class="search-result-count"><%= allListings.length %></span> result<%= allListings.length !== 1 ? 's' : '' %> for
+                <% } else { %>
+                    No results for
+                <% } %>
+                "<strong><%= searchQuery %></strong>"
+                &nbsp;·&nbsp; <a href="/listings" class="search-clear">Clear</a>
+            </p>
+        </div>
+        <% } %>
+
+        <% if (allListings.length === 0) { %>
+        <div class="search-empty">
+            <i class="fa-regular fa-face-sad-tear fa-3x mb-3" style="color:#dddddd;"></i>
+            <h5>No listings found</h5>
+            <p>Try a different location or keyword.</p>
+            <a href="/listings" class="sp-btn sp-btn--primary px-4">Browse all listings</a>
+        </div>
+        <% } else { %>
         <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 g-4 mt-2">
             <% for(let listing of allListings) { %>
                 <a href="/listings/<%= listing._id %>" class="listing-link">
@@ -82,4 +104,5 @@
                 </a>
                 <% } %>
         </div>
+        <% } %>
     </div>

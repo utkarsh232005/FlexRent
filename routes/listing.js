@@ -27,6 +27,8 @@ router.route("/")
     .get(wrapAsync(ListingController.index))
     .post(isLoggedIn, uploadSingle, validateListing, wrapAsync(ListingController.create));
 
+router.get("/suggestions", wrapAsync(ListingController.suggestions));
+
 router.get("/new", isLoggedIn, ListingController.renderNewForm);
 
 router.route("/:id")

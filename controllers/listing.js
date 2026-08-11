@@ -15,8 +15,40 @@ const geocode = async (locationStr) => {
 
 // GET /listings
 module.exports.index = async (req, res) => {
-    const allListings = await Listing.find({});
-    res.render("./listings/index.ejs", { allListings });
+    const q = (req.query.q || "").trim();
+    let allListings;
+    if (q) {
+        const regex = new RegExp(q, "i");
+        allListings = await Listing.find({
+            $or: [{ title: regex }, { location: regex }, { country: regex }]
+        });
+    } else {
+        allListings = await Listing.find({});
+    }
+    res.render("./listings/index.ejs", { allListings, searchQuery: q });
+};
+
+// GET /listings/suggestions?q=...
+module.exports.suggestions = async (req, res) => {
+    const q = (req.query.q || "").trim();
+    if (!q || q.length < 1) {
+        return res.json([]);
+    }
+    const regex = new RegExp(q, "i");
+    const matches = await Listing.find({
+        $or: [{ title: regex }, { location: regex }, { country: regex }]
+    })
+        .limit(6)
+        .select("title location country image _id");
+
+    const results = matches.map((item) => ({
+        id: item._id,
+        title: item.title,
+        location: `${item.location}, ${item.country}`,
+        image: item.image?.url
+    }));
+
+    res.json(results);
 };
 
 // GET /listings/new

@@ -2,6 +2,17 @@ const Listing = require("../model/listing");
 const { cloudinary } = require("../cloudConfig");
 const { syncAtlas } = require("../utils/dbSync");
 
+// ── Geocoding helper ────────────────────────────────────────────────────────
+const geocode = async (locationStr) => {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationStr)}.json?access_token=${process.env.MAP_TOKEN}&limit=1`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.features && data.features.length > 0) {
+        return data.features[0].center; // [longitude, latitude]
+    }
+    return [0, 0]; // fallback
+};
+
 // GET /listings
 module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});
@@ -34,6 +45,11 @@ module.exports.create = async (req, res) => {
         newListing.image = { url: req.file.path, filename: req.file.filename };
     }
     newListing.owner = req.user._id;
+
+    // Geocode the location and store coordinates
+    const locationStr = `${rest.location}, ${rest.country}`;
+    newListing.geometry.coordinates = await geocode(locationStr);
+
     await newListing.save();
 
     // Synchronize the newly created listing to MongoDB Atlas (Development Sync)
@@ -54,14 +70,25 @@ module.exports.update = async (req, res) => {
     let { id } = req.params;
     const { image, ...rest } = req.body.listing;
     const updateData = { ...rest };
-    if (image && image !== "") {
-        updateData.image = { filename: "listingimage", url: image };
-    } else {
-        updateData.image = {
-            filename: "listingimage",
-            url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8aG90ZWxzfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60"
-        };
+
+    const listing = await Listing.findById(id);
+
+    if (req.file) {
+        // A new image was uploaded — delete old one from Cloudinary (if it's a real upload)
+        if (listing && listing.image && listing.image.filename && listing.image.filename !== "listingimage") {
+            await cloudinary.uploader.destroy(listing.image.filename);
+        }
+        updateData.image = { url: req.file.path, filename: req.file.filename };
     }
+    // else: no new file uploaded — keep the existing image as-is
+
+    // Re-geocode if location or country changed
+    const locationStr = `${rest.location || listing.location}, ${rest.country || listing.country}`;
+    updateData.geometry = {
+        type: "Point",
+        coordinates: await geocode(locationStr)
+    };
+
     await Listing.findByIdAndUpdate(id, updateData, { new: true });
 
     // Synchronize listing updates to MongoDB Atlas (Development Sync)

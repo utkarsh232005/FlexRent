@@ -31,7 +31,7 @@ router.get("/new", isLoggedIn, ListingController.renderNewForm);
 
 router.route("/:id")
     .get(wrapAsync(ListingController.show))
-    .put(isLoggedIn, isOwner, validateListing, wrapAsync(ListingController.update))
+    .put(isLoggedIn, isOwner, uploadSingle, validateListing, wrapAsync(ListingController.update))
     .delete(isLoggedIn, isOwner, wrapAsync(ListingController.destroy));
 
 router.get("/:id/edit", isLoggedIn, wrapAsync(ListingController.renderEditForm));

@@ -1,138 +1,252 @@
 <% layout("/layouts/boilerplate") %>
-<div class="show-page py-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
 
-            <!-- Title & Location -->
-            <h1 class="fw-bold mb-1" style="font-size: 1.75rem;"><%= listing.title %></h1>
-            <p class="mb-3" style="color: #717171;">
-                <i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %>
-            </p>
-
-            <!-- Hero Image -->
-            <div class="mb-4">
-                <img src="<%= listing.image.url %>" alt="<%= listing.title %>"
-                     style="width: 100%; height: 420px; object-fit: cover; border-radius: 12px;">
+    <!-- ─── Hero Banner ─────────────────────────────────────────────────────── -->
+    <div class="sp-hero">
+        <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="sp-hero__img">
+        <div class="sp-hero__overlay">
+            <div class="sp-hero__badge">
+                <i class="fa-solid fa-location-dot me-1"></i>
+                <%= listing.location %>, <%= listing.country %>
             </div>
-
-            <!-- Two Column Layout: Details + Price Sidebar -->
-            <div class="row">
-                <!-- Left Column: Description -->
-                <div class="col-12 col-md-7 col-lg-8">
-                    <div class="pb-4 mb-4" style="border-bottom: 1px solid #ebebeb;">
-                        <p class="mb-3" style="color: #717171;">
-                            Owned by <i><%= listing.owner ? listing.owner.username : "Owner" %></i>
-                        </p>
-                        <h2 class="fw-semibold mb-2" style="font-size: 1.35rem;">About this place</h2>
-                        <p style="color: #717171; line-height: 1.7; font-size: 1rem;">
-                            <%= listing.description %>
-                        </p>
-                    </div>
-
-                    <!-- Actions -->
-
-                    <% if(currUser && listing.owner._id.toString() === currUser._id.toString()){ %>
-                    <div class="d-flex gap-2 pb-4 mb-4" style="border-bottom: 1px solid #ebebeb;">
-                        <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-dark btn-sm px-3 py-2" style="border-radius: 8px;">
-                            <i class="fa-solid fa-pen me-1"></i>Edit
-                        </a>
-                        <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="m-0">
-                            <button type="submit" class="btn btn-outline-danger btn-sm px-3 py-2" style="border-radius: 8px;">
-                                <i class="fa-solid fa-trash me-1"></i>Delete
-                            </button>
-                        </form>
-                    </div>
-                    <% } %>
-                </div>
-
-                <!-- Right Column: Price Card -->
-                <div class="col-12 col-md-5 col-lg-4">
-                    <div style="border: 1px solid #dddddd; border-radius: 12px; padding: 24px; box-shadow: 0 6px 16px rgba(0,0,0,0.08); position: sticky; top: 100px;">
-                        <div class="d-flex align-items-baseline gap-1 mb-3">
-                            <span class="fw-bold" style="font-size: 1.5rem;">₹<%= listing.price.toLocaleString("en-IN") %></span>
-                            <span style="color: #717171; font-size: 1rem;">/ night</span>
-                        </div>
-                        <div class="mb-3 p-3" style="background: #f7f7f7; border-radius: 8px;">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span style="color: #717171; font-size: 0.9rem;">Location</span>
-                                <span class="fw-medium" style="font-size: 0.9rem;"><%= listing.location %></span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span style="color: #717171; font-size: 0.9rem;">Country</span>
-                                <span class="fw-medium" style="font-size: 0.9rem;"><%= listing.country %></span>
-                            </div>
-                        </div>
-                        <a href="#review-section" class="btn w-100 py-2 text-white fw-semibold" style="background: #ff385c; border-radius: 8px; border: none;">
-                            <i class="fa-solid fa-star me-1"></i>Write a Review
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reviews Section -->
-            <div id="review-section" class="pt-2">
-                <div class="pb-4 mb-4" style="border-bottom: 1px solid #ebebeb;">
-                    <h2 class="fw-semibold mb-3" style="font-size: 1.35rem;">Leave a Review</h2>
-                    <% if(currUser){ %>
-                    <form action="/listings/<%= listing._id %>/reviews" method="POST" class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label class="form-label fw-medium" style="font-size: 0.95rem;">Rating</label>
-                            <div class="star-rating">
-                                <input type="radio" id="star5" name="review[rating]" value="5" />
-                                <label for="star5" class="fa-solid fa-star"></label>
-                                <input type="radio" id="star4" name="review[rating]" value="4" />
-                                <label for="star4" class="fa-solid fa-star"></label>
-                                <input type="radio" id="star3" name="review[rating]" value="3" />
-                                <label for="star3" class="fa-solid fa-star"></label>
-                                <input type="radio" id="star2" name="review[rating]" value="2" />
-                                <label for="star2" class="fa-solid fa-star"></label>
-                                <input type="radio" id="star1" name="review[rating]" value="1" checked />
-                                <label for="star1" class="fa-solid fa-star"></label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="comment" class="form-label fw-medium" style="font-size: 0.95rem;">Comments</label>
-                            <textarea name="review[comment]" id="comment" rows="3" class="form-control" required
-                                      style="border-radius: 8px; border-color: #dddddd;"></textarea>
-                            <div class="invalid-feedback">Please add some comments for your review.</div>
-                        </div>
-                        <button class="btn btn-dark px-4 py-2" style="border-radius: 8px;">Submit Review</button>
-                    </form>
-                </div>
-                <% }else{ %>
-                    <p style="color: #717171; font-size: 0.95rem;">Please login to leave a review.</p>
-                    <% } %> 
-
-                <% if (listing.reviews.length > 0) { %>
-                    <h2 class="fw-semibold mb-3" style="font-size: 1.35rem;">
-                        <i class="fa-solid fa-star me-1" style="color: #ffb400;"></i><%= listing.reviews.length %> Review<%= listing.reviews.length > 1 ? 's' : '' %>
-                    </h2>
-                    <div class="row">
-                        <% for(review of listing.reviews){ %>
-                            <div class="col-12 col-md-6 mb-3">
-                                <div style="padding: 20px; border: 1px solid #ebebeb; border-radius: 12px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2 mb-2">
-                                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #222; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem;"><%= review.author ? review.author.username[0].toUpperCase() : 'G' %></div>
-                                            <div>
-                                                <div class="fw-semibold" style="font-size: 0.95rem;"><%= review.author ? review.author.username : 'Guest' %></div>
-                                                <div style="color: #ffb400; font-size: 0.85rem;">
-                                                    <% for(let i = 0; i < review.rating; i++) { %>★<% } %><% for(let i = review.rating; i < 5; i++) { %>☆<% } %>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p style="color: #717171; font-size: 0.95rem; margin-bottom: 12px;"><%= review.comment %></p>
-                                    </div>
-                                    <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="mb-0 text-end">
-                                        <button class="btn btn-sm px-0 py-0" style="color: #717171; font-size: 0.8rem; text-decoration: underline; border: none; background: none;">Remove</button>
-                                    </form>
-                                </div>
-                            </div>
-                        <% } %>
-                    </div>
-                <% } %>
-            </div>
-
         </div>
     </div>
-</div>
+
+    <!-- ─── Main Content ─────────────────────────────────────────────────────── -->
+    <div class="sp-wrap">
+
+        <!-- Title Row -->
+        <div class="sp-title-row">
+            <div class="sp-title-left">
+                <h1 class="sp-title">
+                    <%= listing.title %>
+                </h1>
+                <p class="sp-subtitle">
+                    <i class="fa-solid fa-location-dot me-1" style="color:#ff385c;"></i>
+                    <%= listing.location %>, <%= listing.country %>
+                </p>
+            </div>
+            <div class="sp-price-pill">
+                <span class="sp-price-amount">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                <span class="sp-price-night">/ night</span>
+            </div>
+        </div>
+
+        <!-- Host Row -->
+        <div class="sp-host-row">
+            <div class="sp-host-avatar">
+                <%= listing.owner ? listing.owner.username[0].toUpperCase() : "H" %>
+            </div>
+            <div>
+                <div class="sp-host-label">Hosted by</div>
+                <div class="sp-host-name">
+                    <%= listing.owner ? listing.owner.username : "Owner" %>
+                </div>
+            </div>
+            <% if(currUser && listing.owner._id.toString()===currUser._id.toString()){ %>
+                <div class="sp-owner-actions ms-auto d-flex gap-2">
+                    <a href="/listings/<%= listing._id %>/edit" class="sp-btn sp-btn--ghost">
+                        <i class="fa-solid fa-pen me-1"></i>Edit
+                    </a>
+                    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="m-0">
+                        <button type="submit" class="sp-btn sp-btn--danger">
+                            <i class="fa-solid fa-trash me-1"></i>Delete
+                        </button>
+                    </form>
+                </div>
+                <% } %>
+        </div>
+
+        <div class="sp-divider"></div>
+
+        <!-- Two-column layout -->
+        <div class="sp-grid">
+
+            <!-- LEFT: Description + Reviews -->
+            <div class="sp-main">
+
+                <!-- About -->
+                <section class="sp-section">
+                    <h2 class="sp-section-title">About this place</h2>
+                    <p class="sp-description">
+                        <%= listing.description %>
+                    </p>
+                </section>
+
+                <div class="sp-divider"></div>
+
+                <!-- What this place offers (static chips) -->
+                <section class="sp-section">
+                    <h2 class="sp-section-title">What this place offers</h2>
+                    <div class="sp-amenities">
+                        <div class="sp-amenity"><i class="fa-solid fa-wifi"></i> Wifi</div>
+                        <div class="sp-amenity"><i class="fa-solid fa-car"></i> Free parking</div>
+                        <div class="sp-amenity"><i class="fa-solid fa-tv"></i> TV</div>
+                        <div class="sp-amenity"><i class="fa-solid fa-kitchen-set"></i> Kitchen</div>
+                        <div class="sp-amenity"><i class="fa-solid fa-snowflake"></i> Air conditioning</div>
+                        <div class="sp-amenity"><i class="fa-solid fa-fire"></i> Heating</div>
+                    </div>
+                </section>
+
+                <div class="sp-divider"></div>
+
+                <!-- Map -->
+                <section class="sp-section">
+                    <h2 class="sp-section-title">Where you'll be</h2>
+                    <p class="sp-description mb-3">
+                        <i class="fa-solid fa-location-dot me-1" style="color:#ff385c;"></i>
+                        <%= listing.location %>, <%= listing.country %>
+                    </p>
+                    <div id="map" data-token="<%= process.env.MAP_TOKEN %>"
+                        data-coords="<%- JSON.stringify(listing.geometry.coordinates) %>"
+                        data-title="<%= listing.title + ', ' + listing.location %>"></div>
+                </section>
+
+                <div class="sp-divider"></div>
+
+                <!-- Reviews -->
+                <section class="sp-section" id="review-section">
+                    <% if (listing.reviews.length> 0) { %>
+                        <h2 class="sp-section-title">
+                            <i class="fa-solid fa-star me-1" style="color:#ffb400;"></i>
+                            <%= listing.reviews.length %> Review<%= listing.reviews.length> 1 ? 's' : '' %>
+                        </h2>
+                        <div class="sp-reviews-grid">
+                            <% for(review of listing.reviews){ %>
+                                <div class="sp-review-card">
+                                    <div class="sp-review-header">
+                                        <div class="sp-review-avatar">
+                                            <%= review.author ? review.author.username[0].toUpperCase() : 'G' %>
+                                        </div>
+                                        <div>
+                                            <div class="sp-review-name">
+                                                <%= review.author ? review.author.username : 'Guest' %>
+                                            </div>
+                                            <div class="sp-review-stars">
+                                                <% for(let i=0; i < review.rating; i++) { %><span
+                                                        class="sp-star filled">★</span>
+                                                    <% } %>
+                                                        <% for(let i=review.rating; i < 5; i++) { %><span
+                                                                class="sp-star">☆</span>
+                                                            <% } %>
+                                            </div>
+                                        </div>
+                                        <% if(currUser && review.author &&
+                                            review.author._id.toString()===currUser._id.toString()){ %>
+                                            <form method="POST"
+                                                action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+                                                class="ms-auto mb-0">
+                                                <button class="sp-review-del" title="Delete review">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                            <% } %>
+                                    </div>
+                                    <p class="sp-review-body">
+                                        <%= review.comment %>
+                                    </p>
+                                </div>
+                                <% } %>
+                        </div>
+                        <% } else { %>
+                            <div class="sp-no-reviews">
+                                <i class="fa-regular fa-star fa-2x mb-2" style="color:#e0e0e0;"></i>
+                                <p>No reviews yet — be the first!</p>
+                            </div>
+                            <% } %>
+
+                                <!-- Write a review -->
+                                <div class="sp-review-form-wrap">
+                                    <h3 class="sp-review-form-title">Leave a Review</h3>
+                                    <% if(currUser){ %>
+                                        <form action="/listings/<%= listing._id %>/reviews" method="POST"
+                                            class="needs-validation" novalidate>
+                                            <div class="mb-3">
+                                                <label class="sp-form-label">Your Rating</label>
+                                                <div class="star-rating">
+                                                    <input type="radio" id="star5" name="review[rating]" value="5" />
+                                                    <label for="star5" class="fa-solid fa-star"></label>
+                                                    <input type="radio" id="star4" name="review[rating]" value="4" />
+                                                    <label for="star4" class="fa-solid fa-star"></label>
+                                                    <input type="radio" id="star3" name="review[rating]" value="3" />
+                                                    <label for="star3" class="fa-solid fa-star"></label>
+                                                    <input type="radio" id="star2" name="review[rating]" value="2" />
+                                                    <label for="star2" class="fa-solid fa-star"></label>
+                                                    <input type="radio" id="star1" name="review[rating]" value="1"
+                                                        checked />
+                                                    <label for="star1" class="fa-solid fa-star"></label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="comment" class="sp-form-label">Comments</label>
+                                                <textarea name="review[comment]" id="comment" rows="4"
+                                                    class="sp-textarea" required
+                                                    placeholder="Share what you loved about this place…"></textarea>
+                                                <div class="invalid-feedback">Please add some comments for your review.
+                                                </div>
+                                            </div>
+                                            <button class="sp-btn sp-btn--primary w-100">
+                                                <i class="fa-solid fa-paper-plane me-2"></i>Submit Review
+                                            </button>
+                                        </form>
+                                        <% }else{ %>
+                                            <div class="sp-login-prompt">
+                                                <i class="fa-regular fa-user fa-lg me-2"></i>
+                                                <span>Please <a href="/login" class="sp-link">log in</a> to leave a
+                                                    review.</span>
+                                            </div>
+                                            <% } %>
+                                </div>
+                </section>
+            </div>
+
+            <!-- RIGHT: Sticky Booking Card -->
+            <aside class="sp-sidebar">
+                <div class="sp-book-card">
+                    <div class="sp-book-price">
+                        <span class="sp-book-amount">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                        <span class="sp-book-night">night</span>
+                    </div>
+
+                    <div class="sp-book-stars mb-3">
+                        <i class="fa-solid fa-star" style="color:#ffb400; font-size:0.85rem;"></i>
+                        <% if (listing.reviews.length> 0) { %>
+                            <span class="fw-semibold" style="font-size:0.9rem;">
+                                <%= listing.reviews.length %> review<%= listing.reviews.length> 1 ? 's' : '' %>
+                            </span>
+                            <% } else { %>
+                                <span style="color:#717171; font-size:0.9rem;">No reviews yet</span>
+                                <% } %>
+                    </div>
+
+                    <div class="sp-book-details">
+                        <div class="sp-book-detail-row">
+                            <i class="fa-solid fa-location-dot" style="color:#ff385c;"></i>
+                            <span>
+                                <%= listing.location %>
+                            </span>
+                        </div>
+                        <div class="sp-book-detail-row">
+                            <i class="fa-solid fa-globe" style="color:#717171;"></i>
+                            <span>
+                                <%= listing.country %>
+                            </span>
+                        </div>
+                        <div class="sp-book-detail-row">
+                            <i class="fa-solid fa-user" style="color:#717171;"></i>
+                            <span>
+                                <%= listing.owner ? listing.owner.username : "Owner" %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <a href="#review-section" class="sp-btn sp-btn--primary w-100 text-center">
+                        <i class="fa-solid fa-star me-2"></i>Write a Review
+                    </a>
+
+                    <p class="sp-book-note">You won't be charged yet</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script src="/js/map.js"></script>

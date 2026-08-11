@@ -17,3 +17,11 @@
         }, false)
     })
 })()
+
+// Filter bar — active state toggle
+document.querySelectorAll('.filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
+        btn.classList.add('active');
+    });
+});

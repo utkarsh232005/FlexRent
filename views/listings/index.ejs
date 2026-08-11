@@ -1,10 +1,68 @@
 <% layout("/layouts/boilerplate") %>
 
     <div class="main mt-5">
-        <h3 class="heading">All Listings</h3>
+        <!-- <h3 class="heading">All Listings</h3> -->
         <!-- <form method="GET" action="/listings/new">
             <button>Create New Listing</button>
         </form> -->
+        <div class="filter-bar-wrap">
+            <div id="filters">
+                <div class="filter active" data-filter="trending">
+                    <i class="fa-solid fa-fire"></i>
+                    <p>Trending</p>
+                </div>
+                <div class="filter" data-filter="rooms">
+                    <i class="fa-solid fa-bed"></i>
+                    <p>Rooms</p>
+                </div>
+                <div class="filter" data-filter="views">
+                    <i class="fa-solid fa-mountain-sun"></i>
+                    <p>Amazing views</p>
+                </div>
+                <div class="filter" data-filter="cities">
+                    <i class="fa-solid fa-city"></i>
+                    <p>Iconic cities</p>
+                </div>
+                <div class="filter" data-filter="surfing">
+                    <i class="fa-solid fa-person-surfing"></i>
+                    <p>Surfing</p>
+                </div>
+                <div class="filter" data-filter="pools">
+                    <i class="fa-solid fa-water-ladder"></i>
+                    <p>Amazing pools</p>
+                </div>
+                <div class="filter" data-filter="beach">
+                    <i class="fa-solid fa-umbrella-beach"></i>
+                    <p>Beach</p>
+                </div>
+                <div class="filter" data-filter="cabins">
+                    <i class="fa-solid fa-house-chimney"></i>
+                    <p>Cabins</p>
+                </div>
+                <div class="filter" data-filter="farms">
+                    <i class="fa-solid fa-tractor"></i>
+                    <p>Farms</p>
+                </div>
+                <div class="filter" data-filter="omg">
+                    <i class="fa-solid fa-face-surprise"></i>
+                    <p>OMG!</p>
+                </div>
+                <div class="filter" data-filter="lakefront">
+                    <i class="fa-solid fa-water"></i>
+                    <p>Lakefront</p>
+                </div>
+                <div class="filter" data-filter="camping">
+                    <i class="fa-solid fa-campground"></i>
+                    <p>Camping</p>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="filter-btn">
+                    <i class="fa-solid fa-sliders me-1"></i> Filters
+                </button>
+            </div>
+        </div>
+
         <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 g-4 mt-2">
             <% for(let listing of allListings) { %>
                 <a href="/listings/<%= listing._id %>" class="listing-link">

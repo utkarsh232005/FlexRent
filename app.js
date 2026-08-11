@@ -120,10 +120,8 @@ app.use((req, res, next) => {
     next();
 });
 
-//root route
-app.get("/", (req, res) => {
-    res.render("./home");
-});
+// Root redirect
+app.get("/", (req, res) => res.redirect("/listings"));
 
 app.use("/listings", listings);
 app.use("/listings/:id/reviews", reviews);
@@ -138,13 +136,18 @@ app.get("/demouser", async (req, res) => {
     res.send(registeredUser);
 });
 
-//middleware
+//middleware - 404 handler: flash error and redirect to listings
 app.all("/*any", (req, res, next) => {
-    next(new ExpressError("Page not found", 404));
+    req.flash("error", "Page not found! The page you're looking for doesn't exist.");
+    res.redirect("/listings");
 });
 
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "something went wrong" } = err;
+    if (statusCode === 404) {
+        req.flash("error", message || "Page not found!");
+        return res.redirect("/listings");
+    }
     res.status(statusCode).render("error", { err: { statusCode, message, stack: err.stack } });
 });
 
